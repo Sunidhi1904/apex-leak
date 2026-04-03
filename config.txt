@@ -1,1 +1,83 @@
+import socket
+import threading
+import time
+
+# -------------------------------
+# Simple Firewall Simulation Code
+# -------------------------------
+
+# Define blocked IPs and suspicious keywords
+BLOCKED_IPS = {"192.168.1.50", "10.0.0.99"}
+SUSPICIOUS_KEYWORDS = ["malware", "attack", "phishing", "exploit"]
+
+# Log file
+LOG_FILE = "firewall_log.txt"
+
+def log_event(event):
+    """Log firewall events to a file with timestamp."""
+    with open(LOG_FILE, "a") as f:
+        f.write(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] {event}\n")
+
+def check_packet(ip, data):
+    """Check incoming packet for suspicious activity."""
+    if ip in BLOCKED_IPS:
+        log_event(f"Blocked packet from {ip}")
+        return False
+    for keyword in SUSPICIOUS_KEYWORDS:
+        if keyword in data.lower():
+            log_event(f"Suspicious content detected from {ip}: {keyword}")
+            return False
+    return True
+
+def handle_client(client_socket, client_address):
+    """Handle incoming client connection."""
+    ip = client_address[0]
+    try:
+        while True:
+            data = client_socket.recv(1024).decode("utf-8")
+            if not data:
+                break
+            if check_packet(ip, data):
+                log_event(f"Allowed traffic from {ip}: {data}")
+                client_socket.send("Packet allowed\n".encode("utf-8"))
+            else:
+                client_socket.send("Packet blocked\n".encode("utf-8"))
+    except Exception as e:
+        log_event(f"Error handling client {ip}: {e}")
+    finally:
+        client_socket.close()
+
+def start_firewall(host="0.0.0.0", port=9999):
+    """Start the firewall server."""
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind((host, port))
+    server.listen(5)
+    log_event(f"Firewall started on {host}:{port}")
+    print(f"Firewall running on {host}:{port}...")
+
+    while True:
+        client_socket, client_address = server.accept()
+        log_event(f"Connection attempt from {client_address[0]}")
+        client_handler = threading.Thread(
+            target=handle_client, args=(client_socket, client_address)
+        )
+        client_handler.start()
+
+if __name__ == "__main__":
+    start_firewall()
 API_KEY=THM{super_secret_key123}
+import os
+
+# List of suspicious file extensions often used by malware
+SUSPICIOUS_EXTENSIONS = [".exe", ".bat", ".scr", ".js", ".vbs"]
+
+def scan_directory(path):
+    print(f"Scanning directory: {path}")
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            for ext in SUSPICIOUS_EXTENSIONS:
+                if file.lower().endswith(ext):
+                    print(f"[!] Suspicious file detected: {os.path.join(root, file)}")
+
+# Example usage
+scan_directory("C:/Users/Public/Documents")
