@@ -78,6 +78,151 @@ def scan_directory(path):
             for ext in SUSPICIOUS_EXTENSIONS:
                 if file.lower().endswith(ext):
                     print(f"[!] Suspicious file detected: {os.path.join(root, file)}")
+# Example: Long Python script combining file handling, networking, and data analysis
 
-# Example usage
-scan_directory("C:/Users/Public/Documents")
+import os
+import requests
+import csv
+import statistics
+
+# Step 1: Download sample data
+url = "https://people.sc.fsu.edu/~jburkardt/data/csv/airtravel.csv"
+response = requests.get(url)
+filename = "airtravel.csv"
+
+with open(filename, "wb") as f:
+    f.write(response.content)
+
+print("Data downloaded successfully!")
+
+# Step 2: Read CSV data
+data = []
+with open(filename, newline="") as csvfile:
+    reader = csv.reader(csvfile)
+    header = next(reader)
+    for row in reader:
+        data.append([int(x) for x in row[1:]])
+
+print("Data loaded:", header)
+
+# Step 3: Perform analysis
+monthly_totals = [sum(month) for month in zip(*data)]
+average_passengers = statistics.mean(monthly_totals)
+
+print("Monthly totals:", monthly_totals)
+print("Average passengers per month:", average_passengers)
+
+# Step 4: Save results
+with open("analysis_results.txt", "w") as f:
+    f.write("Monthly totals: " + str(monthly_totals) + "\n")
+    f.write("Average passengers: " + str(average_passengers) + "\n")
+
+print("Analysis saved to analysis_results.txt")
+#!/usr/bin/env python3
+"""
+Cybersecurity Log Analyzer
+Author: Example
+Purpose: Parse system logs, detect suspicious activity, and generate a report.
+"""
+
+import re
+import os
+import datetime
+from collections import defaultdict
+
+# Step 1: Define suspicious patterns
+SUSPICIOUS_PATTERNS = {
+    "failed_login": re.compile(r"Failed password for .* from (\d+\.\d+\.\d+\.\d+)"),
+    "port_scan": re.compile(r"Connection attempt from (\d+\.\d+\.\d+\.\d+) on port (\d+)"),
+    "sql_injection": re.compile(r"(?:SELECT|UNION|DROP|INSERT).*", re.IGNORECASE),
+}
+
+# Step 2: Load log file
+LOG_FILE = "system.log"
+
+if not os.path.exists(LOG_FILE):
+    print(f"Log file {LOG_FILE} not found. Please provide a valid log file.")
+    exit(1)
+
+# Step 3: Parse logs
+alerts = defaultdict(list)
+
+with open(LOG_FILE, "r") as f:
+    for line in f:
+        for category, pattern in SUSPICIOUS_PATTERNS.items():
+            match = pattern.search(line)
+            if match:
+                alerts[category].append((line.strip(), match.groups()))
+
+# Step 4: Generate report
+timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+report_file = "security_report.txt"
+
+with open(report_file, "w") as report:
+    report.write(f"Cybersecurity Log Analysis Report\n")
+    report.write(f"Generated: {timestamp}\n\n")
+
+    if not alerts:
+        report.write("No suspicious activity detected.\n")
+    else:
+        for category, entries in alerts.items():
+            report.write(f"=== {category.upper()} ===\n")
+            for entry, details in entries:
+                report.write(f"Log: {entry}\nDetails: {details}\n\n")
+
+print(f"Analysis complete. Report saved to {report_file}")
+#!/usr/bin/env python3
+"""
+Cybersecurity Packet Sniffer
+Purpose: Capture network packets, analyze headers, and detect suspicious traffic patterns.
+"""
+
+import socket
+import struct
+
+# Step 1: Create raw socket
+# AF_PACKET works on Linux; for Windows, use AF_INET with SOCK_RAW
+sniffer = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(0x0003))
+
+def ethernet_frame(data):
+    dest_mac, src_mac, proto = struct.unpack('!6s6sH', data[:14])
+    return (
+        ':'.join('%02x' % b for b in dest_mac),
+        ':'.join('%02x' % b for b in src_mac),
+        socket.htons(proto),
+        data[14:]
+    )
+
+def ipv4_packet(data):
+    version_header_length = data[0]
+    header_length = (version_header_length & 15) * 4
+    ttl, proto, src, target = struct.unpack('!8xBB2x4s4s', data[:20])
+    return (
+        ttl,
+        proto,
+        '.'.join(map(str, src)),
+        '.'.join(map(str, target)),
+        data[header_length:]
+    )
+
+print("Sniffer started... Press Ctrl+C to stop.")
+
+try:
+    while True:
+        raw_data, addr = sniffer.recvfrom(65535)
+        dest_mac, src_mac, eth_proto, data = ethernet_frame(raw_data)
+        print(f"\nEthernet Frame: {src_mac} -> {dest_mac}, Protocol: {eth_proto}")
+
+        # IPv4 packets
+        if eth_proto == 8:
+            ttl, proto, src, target, data = ipv4_packet(data)
+            print(f"IPv4 Packet: {src} -> {target}, TTL: {ttl}, Protocol: {proto}")
+
+            # Detect suspicious traffic (example: unusual TTL or ICMP flood)
+            if ttl < 5:
+                print("⚠️ Suspicious: Very low TTL (possible crafted packet)")
+            if proto == 1:  # ICMP
+                print("⚠️ ICMP traffic detected (possible ping flood)")
+except KeyboardInterrupt:
+    print("\nSniffer stopped.")
+
