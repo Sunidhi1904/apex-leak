@@ -65,7 +65,7 @@ def start_firewall(host="0.0.0.0", port=9999):
 
 if __name__ == "__main__":
     start_firewall()
-API_KEY=THM{super_secret_key123}
+API_KEY=THM{super_secret_key1234}
 import os
 
 # List of suspicious file extensions often used by malware
@@ -124,86 +124,7 @@ Cybersecurity Log Analyzer
 Author: Example
 Purpose: Parse system logs, detect suspicious activity, and generate a report.
 """
-
-import re
-import os
-import datetime
-from collections import defaultdict
-
-# Step 1: Define suspicious patterns
-SUSPICIOUS_PATTERNS = {
-    "failed_login": re.compile(r"Failed password for .* from (\d+\.\d+\.\d+\.\d+)"),
-    "port_scan": re.compile(r"Connection attempt from (\d+\.\d+\.\d+\.\d+) on port (\d+)"),
-    "sql_injection": re.compile(r"(?:SELECT|UNION|DROP|INSERT).*", re.IGNORECASE),
-}
-
-# Step 2: Load log file
-LOG_FILE = "system.log"
-
-if not os.path.exists(LOG_FILE):
-    print(f"Log file {LOG_FILE} not found. Please provide a valid log file.")
-    exit(1)
-
-# Step 3: Parse logs
-alerts = defaultdict(list)
-
-with open(LOG_FILE, "r") as f:
-    for line in f:
-        for category, pattern in SUSPICIOUS_PATTERNS.items():
-            match = pattern.search(line)
-            if match:
-                alerts[category].append((line.strip(), match.groups()))
-
-# Step 4: Generate report
-timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-report_file = "security_report.txt"
-
-with open(report_file, "w") as report:
-    report.write(f"Cybersecurity Log Analysis Report\n")
-    report.write(f"Generated: {timestamp}\n\n")
-
-    if not alerts:
-        report.write("No suspicious activity detected.\n")
-    else:
-        for category, entries in alerts.items():
-            report.write(f"=== {category.upper()} ===\n")
-            for entry, details in entries:
-                report.write(f"Log: {entry}\nDetails: {details}\n\n")
-
-print(f"Analysis complete. Report saved to {report_file}")
-#!/usr/bin/env python3
-"""
-Cybersecurity Packet Sniffer
-Purpose: Capture network packets, analyze headers, and detect suspicious traffic patterns.
-"""
-
-import socket
-import struct
-
-# Step 1: Create raw socket
-# AF_PACKET works on Linux; for Windows, use AF_INET with SOCK_RAW
-sniffer = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(0x0003))
-
-def ethernet_frame(data):
-    dest_mac, src_mac, proto = struct.unpack('!6s6sH', data[:14])
-    return (
-        ':'.join('%02x' % b for b in dest_mac),
-        ':'.join('%02x' % b for b in src_mac),
-        socket.htons(proto),
-        data[14:]
-    )
-
-def ipv4_packet(data):
-    version_header_length = data[0]
-    header_length = (version_header_length & 15) * 4
-    ttl, proto, src, target = struct.unpack('!8xBB2x4s4s', data[:20])
-    return (
-        ttl,
-        proto,
-        '.'.join(map(str, src)),
-        '.'.join(map(str, target)),
-        data[header_length:]
-    )
+API_KEY=THM{super_secret_key123}
 
 print("Sniffer started... Press Ctrl+C to stop.")
 
@@ -223,6 +144,244 @@ try:
                 print("⚠️ Suspicious: Very low TTL (possible crafted packet)")
             if proto == 1:  # ICMP
                 print("⚠️ ICMP traffic detected (possible ping flood)")
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Participant Registration Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+    }
+    .form-container {
+      background: #fff;
+      padding: 25px;
+      border-radius: 8px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input[type="text"], input[type="email"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .note {
+      font-size: 0.9em;
+      color: #666;
+    }
+    .error {
+      color: red;
+      font-size: 0.9em;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: #0078d7;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #005a9e;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Event Registration</h2>
+    <form id="registrationForm">
+      <label for="name">Full Name:</label>
+      <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+
+      <label for="collegeEmail">Please enter your official college email address:</label>
+      <input type="email" id="collegeEmail" name="collegeEmail" placeholder="example@college.edu" required>
+      <div class="note">Note: Only college email IDs will be accepted (e.g., name@college.edu).</div>
+      <div id="emailError" class="error"></div>
+
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("registrationForm").addEventListener("submit", function(event) {
+      event.preventDefault(); // prevent form submission until validated
+
+      const emailInput = document.getElementById("collegeEmail").value.trim();
+      const errorDiv = document.getElementById("emailError");
+
+      // Example: enforce domain to be "@college.edu"
+      const allowedDomain = "@college.edu";
+
+      if (!emailInput.endsWith(allowedDomain)) {
+        errorDiv.textContent = "Please use your official college email ending with " + allowedDomain;
+      } else {
+        errorDiv.textContent = "";
+        alert("Registration successful! Thank you for providing your college email.");
+        // Here you could submit the form data to your server
+        // e.g., using fetch() or AJAX
+      }
+    });
+  </script>
+</body>
+</html>
 except KeyboardInterrupt:
     print("\nSniffer stopped.")
+API_KEY=THM{super_secret_key12345}
+from flask import Flask, render_template_string, request
+
+app = Flask(__name__)
+
+# HTML template embedded directly in Python
+form_template = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Participant Registration</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: #fff; padding: 25px;
+                     border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc;
+                border-radius: 4px; }
+        .error { color: red; margin-top: 10px; }
+        .success { color: green; margin-top: 10px; }
+        button { margin-top: 20px; width: 100%; padding: 12px; background: #0078d7;
+                 color: #fff; border: none; border-radius: 4px; font-size: 16px; }
+        button:hover { background: #005a9e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Event Registration</h2>
+        <form method="POST">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+
+            <label for="collegeEmail">College Email Address:</label>
+            <input type="email" id="collegeEmail" name="collegeEmail" placeholder="example@college.edu" required>
+            <small>Note: Only official college email IDs will be accepted.</small>
+
+            <button type="submit">Register</button>
+        </form>
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        {% if success %}
+            <div class="success">{{ success }}</div>
+        {% endif %}
+    </div>
+</body>
+</html>
+"""
+
+@app.route("/", methods=["GET", "POST"])
+def register():
+    error = None
+    success = None
+
+    if request.method == "POST":
+        name = request.form.get("name").strip()
+        email = request.form.get("collegeEmail").strip()
+
+        # Replace with your actual college domain
+        allowed_domain = "@college.edu"
+
+        if not email.endswith(allowed_domain):
+            error = f"Invalid email. Please use your official college email ending with {allowed_domain}."
+        else:
+            success = f"Thank you {name}! Registration successful with email {email}."
+
+    return render_template_string(form_template, error=error, success=success)
+
+if __name__ == "__main__":
+    app.run(debug=True)
+import re
+import socket
+import ssl
+import requests
+
+# Allowed domain for college emails
+ALLOWED_DOMAIN = "@college.edu"
+
+def validate_email(email: str) -> bool:
+    """
+    Validate that the email is in proper format and belongs to the allowed domain.
+    """
+    pattern = r"^[a-zA-Z0-9._%+-]+@college\.edu$"
+    return re.match(pattern, email) is not None
+
+def check_domain_security(domain: str) -> dict:
+    """
+    Perform a basic cybersecurity check:
+    - Verify DNS resolution
+    - Check SSL certificate validity
+    - Attempt HTTPS connection
+    """
+    results = {"domain": domain, "dns": None, "ssl": None, "https": None}
+
+    try:
+        # DNS resolution
+        ip = socket.gethostbyname(domain)
+        results["dns"] = f"Resolved to {ip}"
+    except Exception as e:
+        results["dns"] = f"DNS resolution failed: {e}"
+
+    try:
+        # SSL certificate check
+        context = ssl.create_default_context()
+        with socket.create_connection((domain, 443)) as sock:
+            with context.wrap_socket(sock, server_hostname=domain) as ssock:
+                cert = ssock.getpeercert()
+                results["ssl"] = f"SSL certificate valid, issued to {cert['subject']}"
+    except Exception as e:
+        results["ssl"] = f"SSL check failed: {e}"
+
+    try:
+        # HTTPS request check
+        response = requests.get(f"https://{domain}", timeout=5)
+        results["https"] = f"HTTPS reachable, status code {response.status_code}"
+    except Exception as e:
+        results["https"] = f"HTTPS request failed: {e}"
+
+    return results
+
+
+def main():
+    print("=== Cybersecurity Email & Domain Validator ===")
+    email = input("Enter your official college email address: ").strip()
+
+    if validate_email(email):
+        print(f"✅ Email validated: {email}")
+        domain = email.split("@")[1]
+        print(f"Performing security checks on domain: {domain}...\n")
+        results = check_domain_security(domain)
+        for key, value in results.items():
+            print(f"{key.upper()}: {value}")
+    else:
+        print("❌ Invalid email. Please use your official college email ending with @college.edu.")
+
+if __name__ == "__main__":
+    main()
 
